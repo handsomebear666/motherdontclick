@@ -57,13 +57,28 @@ import OfficialAccount from "@/components/phone/OfficialAccount.vue";
 import PhishingForm from "@/components/phone/PhishingForm.vue";
 import ProfileFake from "@/components/phone/ProfileFake.vue";
 import ProfileReal from "@/components/phone/ProfileReal.vue";
-// 下面这三个就是刚才漏掉的“罪魁祸首”！
 import FakeMoments from "@/components/phone/FakeMoments.vue";
 import GroupSearch from "@/components/phone/GroupSearch.vue";
 import ActionMenu from "@/components/phone/ActionMenu.vue";
+import { computed } from 'vue';
+import { useGameStore } from "@/store/useGameStore";
+import { GAME_STORY, ASSETS } from "@/data/story"; // 导入剧本和资源
 
 const store = useGameStore();
 const reloadGame = () => location.reload();
+
+// 根据当前剧本行获取立绘
+const currentCharacter = computed(() => {
+  const line = GAME_STORY.scriptLines.find(l => l.id === store.currentLineId);
+  return line?.emotion ? ASSETS.AVATARS[`mom_${line.emotion}`] : '';
+});
+
+// 背景图片（可动态也可固定，这里演示动态：如果剧本行有 background 字段则使用，否则用默认）
+const currentBackground = computed(() => {
+  const line = GAME_STORY.scriptLines.find(l => l.id === store.currentLineId);
+  // 如果剧本行指定了背景，则使用对应的背景图；否则使用默认背景
+  return line?.background ? ASSETS.BACKGROUNDS[line.background] : '/assets/img/default-bg.jpg';
+});
 </script>
 
 <style scoped>
