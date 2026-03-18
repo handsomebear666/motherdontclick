@@ -4,19 +4,18 @@
       <StartScreen v-if="!store.hasStarted" />
     </transition>
 
-    <div v-show="store.hasStarted" style="width: 100%; height: 100%">
-      <Character />
+    <div
+      v-show="store.hasStarted"
+      style="position: absolute; top: 0; left: 0; width: 100%; height: 100%"
+    >
+      <Character
+        v-show="!store.showPhoneSystem"
+        :background="currentBackground"
+        :character="currentCharacter"
+      />
       <PhoneIcon v-if="!store.showPhoneSystem" />
       <DialogueUI v-show="!store.showPhoneSystem" />
     </div>
-
-    <Character
-      v-if="!store.showPhoneSystem"
-      :background="currentBackground"
-      :character="currentCharacter"
-    />
-    <PhoneIcon v-if="!store.showPhoneSystem" />
-    <DialogueUI v-show="!store.showPhoneSystem" />
 
     <HintButton v-show="store.showHintBtn" />
     <Toast />
@@ -26,7 +25,14 @@
       <div
         v-if="store.showPhoneSystem"
         class="wechat-system-wrapper"
-        style="position: absolute; width: 100%; height: 100%; z-index: 50"
+        style="
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          z-index: 50;
+        "
       >
         <WechatChat v-show="store.activePhonePage === 'chat'" />
         <OfficialAccount v-show="store.activePhonePage.startsWith('oa-')" />
@@ -53,20 +59,16 @@
 </template>
 
 <script setup>
+import { computed } from "vue";
 import { useGameStore } from "@/store/useGameStore";
-import StartScreen from "@/components/game/StartScreen.vue";
+import { GAME_STORY, ASSETS } from "@/data/story";
 
-// 1. 游戏主视图组件
 import Character from "@/components/game/Character.vue";
 import PhoneIcon from "@/components/game/PhoneIcon.vue";
 import DialogueUI from "@/components/game/DialogueUI.vue";
-
-// 2. 通用悬浮组件
 import HintButton from "@/components/common/HintButton.vue";
 import Toast from "@/components/common/Toast.vue";
 import SmsPopup from "@/components/common/SmsPopup.vue";
-
-// 3. 手机/微信内部系统组件
 import WechatChat from "@/components/phone/WechatChat.vue";
 import OfficialAccount from "@/components/phone/OfficialAccount.vue";
 import PhishingForm from "@/components/phone/PhishingForm.vue";
@@ -75,25 +77,25 @@ import ProfileReal from "@/components/phone/ProfileReal.vue";
 import FakeMoments from "@/components/phone/FakeMoments.vue";
 import GroupSearch from "@/components/phone/GroupSearch.vue";
 import ActionMenu from "@/components/phone/ActionMenu.vue";
-import { computed } from "vue";
-import { GAME_STORY, ASSETS } from "@/data/story"; // 导入剧本和资源
+import StartScreen from "@/components/game/StartScreen.vue";
 
 const store = useGameStore();
 const reloadGame = () => location.reload();
 
-// 根据当前剧本行获取立绘
+const currentLine = computed(() =>
+  GAME_STORY.scriptLines.find((l) => l.id === store.currentLineId),
+);
+
 const currentCharacter = computed(() => {
-  const line = GAME_STORY.scriptLines.find((l) => l.id === store.currentLineId);
+  const line = currentLine.value;
   return line?.emotion ? ASSETS.AVATARS[`mom_${line.emotion}`] : "";
 });
 
-// 背景图片（可动态也可固定，这里演示动态：如果剧本行有 background 字段则使用，否则用默认）
 const currentBackground = computed(() => {
-  const line = GAME_STORY.scriptLines.find((l) => l.id === store.currentLineId);
-  // 如果剧本行指定了背景，则使用对应的背景图；否则使用 ASSETS 中的默认背景
+  const line = currentLine.value;
   return line?.background
     ? ASSETS.BACKGROUNDS[line.background]
-    : ASSETS.BACKGROUNDS.default;
+    : ASSETS.BACKGROUNDS?.default || "";
 });
 </script>
 

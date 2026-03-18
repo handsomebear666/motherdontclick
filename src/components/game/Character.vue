@@ -1,8 +1,9 @@
 <template>
   <div class="character-layer">
-    <!-- 背景层：通过 props 传入 -->
-    <div class="background" :style="{ backgroundImage: `url(${background})` }"></div>
-    <!-- 立绘层：通过 props 传入 -->
+    <div
+      class="background"
+      :style="{ backgroundImage: `url(${background})` }"
+    ></div>
     <img class="character" :src="character" alt="角色立绘" />
   </div>
 </template>
@@ -11,21 +12,24 @@
 defineProps({
   background: {
     type: String,
-    required: true
+    required: true,
   },
   character: {
     type: String,
-    required: true
-  }
+    required: true,
+  },
 });
 </script>
 
 <style scoped>
 .character-layer {
-  position: relative;
+  position: absolute; /* 【修改】：用绝对定位锁住，防止撑开容器 */
+  top: 0;
+  left: 0;
   width: 100%;
-  height: 100vh;
+  height: 100%; /* 【修改】：从 100vh 改为 100%，完美贴合手机外壳 */
   overflow: hidden;
+  z-index: 1;
 }
 .background {
   position: absolute;

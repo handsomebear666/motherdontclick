@@ -37,15 +37,15 @@ const handleStart = () => {
 </script>
 
 <style scoped>
-/* 继承游戏容器的背景色，覆盖全屏 */
+/* 继承游戏全局的暖米色背景 #f7ede2 */
 .start-screen {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: var(--color-bg-container, #f7ede2);
-  z-index: 9999; /* 确保它在最顶层，盖住游戏主界面 */
+  background-color: #f7ede2;
+  z-index: 9999;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -53,29 +53,28 @@ const handleStart = () => {
   box-sizing: border-box;
 }
 
-/* 标题图片容器 */
 .title-container {
   width: 100%;
   display: flex;
   justify-content: center;
   margin-top: 20px;
   margin-bottom: 30px;
-  min-height: 120px; /* 给图片预留高度，防止加载时抖动 */
+  min-height: 120px;
 }
 
 .title-image {
-  width: 80%; /* 图片宽度自适应，你可以根据你的 png 实际比例调整 */
+  width: 80%;
   max-width: 300px;
   object-fit: contain;
 }
 
-/* 剧情介绍白卡 */
+/* 洁白的卡片布局，带柔和阴影 */
 .intro-card {
   background: #ffffff;
   width: 100%;
   border-radius: 16px;
   padding: 30px 20px;
-  box-shadow: 0 8px 24px rgba(90, 70, 52, 0.08); /* 配合游戏色调的暖色阴影 */
+  box-shadow: 0 8px 24px rgba(90, 70, 52, 0.08);
   margin-bottom: 40px;
   position: relative;
 }
@@ -85,15 +84,16 @@ const handleStart = () => {
   margin-bottom: 25px;
 }
 
-/* 标题文字和底部的绿色小横线 */
+/* 【改色 1/3】：把装饰标题的颜色写死为亮琥珀橙 (#ff9f43) */
 .intro-title span {
   font-size: 18px;
   font-weight: bold;
-  color: var(--color-accent, #07c160);
+  color: #ff9f43; /* 这里换成了明亮的橙黄色！ */
   position: relative;
   padding-bottom: 8px;
 }
 
+/* 【改色 2/3】：把标题下面的小横线颜色也写死为亮琥珀橙 (#ff9f43) */
 .intro-title span::after {
   content: "";
   position: absolute;
@@ -102,21 +102,21 @@ const handleStart = () => {
   transform: translateX(-50%);
   width: 24px;
   height: 3px;
-  background-color: var(--color-accent, #07c160);
+  background-color: #ff9f43; /* 这里也换成了明亮的橙黄色！ */
   border-radius: 2px;
 }
 
-/* 剧情正文 */
 .intro-text {
   font-size: 15px;
-  color: var(--color-text-dark, #5a4634);
+  color: #5a4634; /* 深棕色护眼文字 */
   line-height: 1.6;
   text-align: center;
 }
 
-/* 底部大按钮 */
+/* 【改色 3/3】：把按钮主色调写死为亮琥珀橙 (#ff9f43) */
 .start-btn {
-  background-color: var(--color-accent, #07c160);
+  /* 使用了微小的渐变，让它看起来更“亮”：从稍淡的橙黄 (#ffbe76) 到主琥珀橙 (#ff9f43) */
+  background: linear-gradient(135deg, #ffca61 0%, #ff9f43 100%);
   color: #ffffff;
   width: 80%;
   height: 50px;
@@ -125,7 +125,8 @@ const handleStart = () => {
   font-size: 18px;
   font-weight: bold;
   letter-spacing: 1px;
-  box-shadow: 0 6px 16px rgba(7, 193, 96, 0.3);
+  /* 阴影颜色同步调整为琥珀橙系的透明色 rgba(255, 159, 67, 0.4) */
+  box-shadow: 0 6px 16px rgba(255, 159, 67, 0.4);
   cursor: pointer;
   transition:
     transform 0.1s,
@@ -134,6 +135,6 @@ const handleStart = () => {
 
 .start-btn:active {
   transform: scale(0.96);
-  box-shadow: 0 2px 8px rgba(7, 193, 96, 0.2);
+  box-shadow: 0 2px 8px rgba(255, 159, 67, 0.3);
 }
 </style>

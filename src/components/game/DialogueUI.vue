@@ -30,7 +30,7 @@
           class="next-indicator"
           :style="{
             display: 'block',
-            color: isThought ? '#718096' : '#a8c989',
+            color: isThought ? '#718096' : 'var(--color-accent, #ff9f43)',
           }"
         >
           ▼
@@ -61,7 +61,6 @@ const isThought = computed(
   () => !currentLine.value?.name || currentLine.value.name === "系统",
 );
 
-// 控制选项显示时机
 const showOptions = computed(() => {
   return (
     !isTyping.value &&
@@ -70,7 +69,7 @@ const showOptions = computed(() => {
   );
 });
 
-// === 核心还原：动态文本高度测算与分页 ===
+// === 核心升级：带智能分词的高度测算 ===
 const splitTextDynamically = async (text) => {
   await nextTick();
   const el = textEl.value;
@@ -83,18 +82,58 @@ const splitTextDynamically = async (text) => {
   const maxHeight = el.offsetHeight + 2;
   el.innerHTML = "";
 
+  // 1. 智能分词：将文本切分成不可分割的“词块”
+  const tokens = [];
+  let i = 0;
+  // 匹配连续的英文字母或数字
+  const isAlNum = (c) => /^[a-zA-Z0-9]+$/.test(c);
+  // 匹配常见的全半角标点符号（不可做句首）
+  const isPunct = (c) =>
+    /^[.,!?;:'"()\[\]{}<>\-—…、，。！？；：“”‘’（）《》【】]+$/.test(c);
+
+  while (i < text.length) {
+    let char = text[i];
+    let word = char;
+
+    if (isAlNum(char)) {
+      i++;
+      // 如果是数字/英文，向后寻找所有连续的数字/英文打包
+      while (i < text.length && isAlNum(text[i])) {
+        word += text[i];
+        i++;
+      }
+    } else {
+      i++;
+    }
+
+    // 不管前面是中文还是英文数字，只要后面紧跟标点符号，就死死黏在一起
+    while (i < text.length && isPunct(text[i])) {
+      word += text[i];
+      i++;
+    }
+    tokens.push(word);
+  }
+
+  // 2. 按“词块”进行高度测算，绝不硬切
   const pages = [];
   let currentPage = "";
 
-  for (let i = 0; i < text.length; i++) {
-    el.innerHTML = currentPage + text[i];
+  for (let token of tokens) {
+    el.innerHTML = currentPage + token;
     if (el.offsetHeight > maxHeight) {
-      pages.push(currentPage);
-      currentPage = text[i];
+      if (currentPage === "") {
+        // 极端防死循环：如果一个超长的词组直接爆页，强行塞入
+        pages.push(token);
+        currentPage = "";
+      } else {
+        pages.push(currentPage);
+        currentPage = token;
+      }
     } else {
-      currentPage += text[i];
+      currentPage += token;
     }
   }
+
   if (currentPage !== "") pages.push(currentPage);
 
   el.style.height = originalHeight;
@@ -103,7 +142,6 @@ const splitTextDynamically = async (text) => {
   return pages.length > 0 ? pages : [text];
 };
 
-// === 播放单页文本 ===
 const playPage = () => {
   clearInterval(typingTimer);
   displayedText.value = "";
@@ -122,7 +160,6 @@ const playPage = () => {
   }, 30);
 };
 
-// === 启动新的一句话 ===
 const startLine = async () => {
   if (!currentLine.value) return;
   clearInterval(typingTimer);
@@ -133,9 +170,16 @@ const startLine = async () => {
   playPage();
 };
 
-watch(() => store.currentLineId, startLine, { immediate: true });
+watch(
+  () => [store.currentLineId, store.hasStarted],
+  ([newId, hasStarted]) => {
+    if (hasStarted) {
+      startLine();
+    }
+  },
+  { immediate: true },
+);
 
-// === 全屏点击推进逻辑 ===
 const handleContainerClick = () => {
   store.tryPlayBGM();
 
@@ -165,7 +209,6 @@ const selectOption = (opt) => {
 </script>
 
 <style scoped>
-/* 增加一个隐形的点按区域，覆盖在背景和角色之上，但在按钮和气泡之下 */
 .full-screen-clicker {
   position: absolute;
   top: 0;
