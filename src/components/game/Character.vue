@@ -1,17 +1,8 @@
 <template>
   <div class="character-layer">
-    <img :src="currentEmotionImg" />
+    <!-- 背景层：固定不变 -->
+    <div class="background" :style="{ backgroundImage: `url(${backgroundImg})` }"></div>
+    <!-- 立绘层：随剧情变化 -->
+    <img class="character" :src="currentEmotionImg" alt="角色立绘" />
   </div>
 </template>
-
-<script setup>
-import { computed } from "vue";
-import { useGameStore } from "@/store/useGameStore";
-import { GAME_STORY, ASSETS } from "@/data/story";
-
-const store = useGameStore();
-const currentEmotionImg = computed(() => {
-  const line = GAME_STORY.scriptLines.find((l) => l.id === store.currentLineId);
-  return line?.emotion ? ASSETS.AVATARS[`mom_${line.emotion}`] : "";
-});
-</script>
