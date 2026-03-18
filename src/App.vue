@@ -1,6 +1,6 @@
 <template>
   <div class="game-container" :class="{ 'shake-screen': store.isShaking }">
-    <Character />
+    <Character :background="currentBackground" :character="currentCharacter" />
     <PhoneIcon v-if="!store.showPhoneSystem" />
     <DialogueUI v-show="!store.showPhoneSystem" />
 
