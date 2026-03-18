@@ -54,6 +54,7 @@
 
 <script setup>
 import { useGameStore } from "@/store/useGameStore";
+import StartScreen from "@/components/game/StartScreen.vue";
 
 // 1. 游戏主视图组件
 import Character from "@/components/game/Character.vue";
